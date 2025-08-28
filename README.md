@@ -29,7 +29,7 @@ This app demonstrates how to:
 ### Quick Start
 1. **Clone the repo:**
    ```sh
-   git clone https://github.com/yourusername/influx-data-entry.git
+   git clone https://github.com/pranavyey/influx-data-entry.git
    cd influx-data-entry
    ```
 2. **Start backend, InfluxDB, and Grafana:**
