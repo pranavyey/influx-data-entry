@@ -36,7 +36,7 @@ This app demonstrates how to:
    ```sh
    docker-compose up --build
    ```
-3. **Start the frontend:**
+3. **From a seperate terminal, start the frontend:**
    ```sh
    cd influx-data-entry
    npm install
