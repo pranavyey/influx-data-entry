@@ -60,6 +60,7 @@ Services:
 ## Testing
 - Frontend UI (recommended): open http://localhost:3000 and submit examples:
   - `temp,loc=kr,room=e408 value=28`
+  - `temp,loc=kr,room=e702 value=26`
   - `humidity,loc=kr value=0.56`
   - For strings, use a different field name to avoid type conflicts, e.g. `temp,loc=kr value_str="e408"`
 
