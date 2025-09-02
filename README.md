@@ -84,12 +84,13 @@ flowchart LR
    cd influx-data-entry
    ```
 
-2. **Copy environment files:**
+2. **(Optional) Override defaults via env files:**
+   Copy the templates below to `.env.local` only if you want to override defaults. Otherwise you can skip this step — the app runs with sensible defaults.
    ```sh
-   cp frontend/env.example frontend/.env.local
-   cp api/env.example api/.env.local
-   cp infra/influxdb/env.example infra/influxdb/.env.local
-   cp infra/grafana/env.example infra/grafana/.env.local
+   cp -n frontend/env.example frontend/.env.local
+   cp -n api/env.example api/.env.local
+   cp -n infra/influxdb/env.example infra/influxdb/.env.local
+   cp -n infra/grafana/env.example infra/grafana/.env.local
    ```
 
 3. **Start everything:**
@@ -97,12 +98,13 @@ flowchart LR
    make up
    # or: docker compose up -d
    ```
+   The stack will run with defaults if no env files are provided.
 
 4. **Access services:**
-   - Frontend: http://localhost:5173
+   - Frontend: http://localhost:3000
    - API: http://localhost:8000
    - InfluxDB: http://localhost:8086
-   - Grafana: http://localhost:3000
+   - Grafana: http://localhost:3001
 
 ### Makefile Commands
 ```sh
@@ -115,7 +117,7 @@ make status     # Show service status
 ```
 
 ### Testing
-- **Frontend UI:** Open http://localhost:5173 and submit examples:
+- **Frontend UI:** Open http://localhost:3000 and submit examples:
   - `temp,loc=kr,room=e408 value=28`
   - `humidity,loc=kr value=0.56`
   - For strings: `temp,loc=kr value_str="e408"`
@@ -126,7 +128,7 @@ make status     # Show service status
     --data-binary 'temp,loc=kr value=28'
   ```
 
-- **Grafana:** Open http://localhost:3000 → use InfluxDB datasource
+- **Grafana:** Open http://localhost:3001 → use InfluxDB datasource
 
 ## Phase 1: Enhanced Docker (Future)
 - [ ] Health checks and readiness probes
@@ -159,11 +161,17 @@ make k8s-deploy        # Deploy to EKS
 helm install influx-data-entry ./k8s/helm
 ```
 
+## Defaults & Overrides
+- Docker Compose includes environment defaults for all services.
+- FastAPI uses container-friendly defaults: `INFLUXDB_URL=http://influxdb:8086`, `INFLUXDB_ORG=my-org`, `INFLUXDB_BUCKET=my-bucket`, `INFLUXDB_TOKEN=my-token`.
+- Frontend uses `NEXT_PUBLIC_API_URL` and falls back to `http://localhost:8000` if not set.
+- Copy `.env.example` files to `.env.local` only when you need to override these defaults.
+
 ## Troubleshooting
 - **Invalid line protocol:** Remove spaces around commas; quote strings (e.g., `"e408"`)
 - **Field type conflict:** Don't mix types for the same field; use separate fields like `value` (float) and `value_str` (string)
 - **Service unavailable:** Check `make status` and `make logs <service>`
-- **Port conflicts:** Ensure ports 5173, 8000, 8086, 3000 are free
+- **Port conflicts:** Ensure ports 3000, 8000, 8086, 3001 are free
 
 ## License
 MIT

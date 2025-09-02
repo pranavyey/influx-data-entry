@@ -14,10 +14,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-INFLUXDB_URL = os.getenv("INFLUXDB_URL", "http://localhost:8086")
-INFLUXDB_TOKEN = os.getenv("INFLUXDB_TOKEN", "my-token")
+# Safe defaults for container environment
+INFLUXDB_URL = os.getenv("INFLUXDB_URL", "http://influxdb:8086")
 INFLUXDB_ORG = os.getenv("INFLUXDB_ORG", "my-org")
 INFLUXDB_BUCKET = os.getenv("INFLUXDB_BUCKET", "my-bucket")
+INFLUXDB_TOKEN = os.getenv("INFLUXDB_TOKEN", "my-token")
 
 @app.get("/")
 async def root():

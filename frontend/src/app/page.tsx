@@ -13,6 +13,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useState } from "react";
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
 const measurementOptions = ["temp", "humidity", "pressure"];
 const tagOptions = ["loc", "room"];
 const fieldOptions = ["value", "count"];
@@ -44,7 +46,7 @@ export default function Home() {
     const fields = data.fields.filter(f => f.key && f.value).map(f => `${f.key}=${f.value}`).join(",");
     const line = `${data.measurement}${tags ? "," + tags : ""} ${fields}`;
     try {
-      const resp = await fetch("http://localhost:8000/write-line-protocol", {
+      const resp = await fetch(`${API_BASE}/write-line-protocol`, {
         method: "POST",
         headers: { "Content-Type": "text/plain" },
         body: line,
