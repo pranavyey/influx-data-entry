@@ -1,0 +1,47 @@
+# Ingress Configuration
+# TODO: Phase 2 - Implement Kubernetes ingress for external access
+# This will include:
+# - Ingress rules for frontend and API
+# - TLS configuration
+# - Load balancing rules
+
+---
+# Placeholder for ingress
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: influx-data-entry-ingress
+#   namespace: influx-data-entry
+#   annotations:
+#     nginx.ingress.kubernetes.io/rewrite-target: /
+#     cert-manager.io/cluster-issuer: "letsencrypt-prod"
+# spec:
+#   tls:
+#   - hosts:
+#     - influx-data-entry.example.com
+#     secretName: influx-data-entry-tls
+#   rules:
+#   - host: influx-data-entry.example.com
+#     http:
+#       paths:
+#       - path: /
+#         pathType: Prefix
+#         backend:
+#           service:
+#             name: frontend-service
+#             port:
+#               number: 80
+#       - path: /api
+#         pathType: Prefix
+#         backend:
+#           service:
+#             name: api-service
+#             port:
+#               number: 8000
+#       - path: /grafana
+#         pathType: Prefix
+#         backend:
+#           service:
+#             name: grafana-service
+#             port:
+#               number: 3000

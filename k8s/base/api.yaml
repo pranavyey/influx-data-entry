@@ -1,0 +1,75 @@
+# API Deployment and Service
+# TODO: Phase 2 - Implement Kubernetes manifests for API service
+# This will include:
+# - Deployment with proper resource limits and health checks
+# - Service to expose the API
+# - ConfigMap for environment variables
+# - Secrets for sensitive data (InfluxDB tokens, etc.)
+
+---
+# Placeholder for API deployment
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: api
+#   namespace: influx-data-entry
+# spec:
+#   replicas: 2
+#   selector:
+#     matchLabels:
+#       app: api
+#   template:
+#     metadata:
+#       labels:
+#         app: api
+#     spec:
+#       containers:
+#       - name: api
+#         image: influx-data-entry-api:latest
+#         ports:
+#         - containerPort: 8000
+#         env:
+#         - name: INFLUXDB_URL
+#           value: "http://influxdb-service:8086"
+#         - name: INFLUXDB_TOKEN
+#           valueFrom:
+#             secretKeyRef:
+#               name: influxdb-secrets
+#               key: token
+#         - name: INFLUXDB_ORG
+#           valueFrom:
+#             secretKeyRef:
+#               name: influxdb-secrets
+#               key: org
+#         - name: INFLUXDB_BUCKET
+#           valueFrom:
+#             secretKeyRef:
+#               name: influxdb-secrets
+#               key: bucket
+#         livenessProbe:
+#           httpGet:
+#             path: /health
+#             port: 8000
+#           initialDelaySeconds: 30
+#           periodSeconds: 10
+#         readinessProbe:
+#           httpGet:
+#             path: /ready
+#             port: 8000
+#           initialDelaySeconds: 5
+#           periodSeconds: 5
+
+---
+# Placeholder for API service
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: api-service
+#   namespace: influx-data-entry
+# spec:
+#   selector:
+#     app: api
+#   ports:
+#   - port: 8000
+#     targetPort: 8000
+#   type: ClusterIP

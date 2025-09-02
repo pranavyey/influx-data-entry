@@ -13,7 +13,7 @@ This app demonstrates how to:
 - **Backend:** FastAPI (Python)
 - **Database:** InfluxDB 2.x
 - **Visualization:** Grafana
-- **Containerization:** Docker Compose
+- **Containerization:** Docker Compose → Kubernetes
 
 ## Architecture
 ```mermaid
@@ -42,52 +42,128 @@ flowchart LR
   style Grafana fill:#c8e6c9,stroke:#388e3c
 ```
 
-## Getting Started
+## Project Structure
+```
+├── frontend/                 # Next.js frontend
+│   ├── Dockerfile           # Production frontend image
+│   ├── env.example          # Environment variables template
+│   └── src/                 # Source code
+├── api/                     # FastAPI backend
+│   ├── Dockerfile           # Production API image
+│   ├── env.example          # Environment variables template
+│   └── main.py              # API source code
+├── infra/                   # Infrastructure configs
+│   ├── influxdb/
+│   │   └── env.example      # InfluxDB environment template
+│   └── grafana/
+│       └── env.example      # Grafana environment template
+├── k8s/                     # Kubernetes manifests
+│   ├── base/                # Raw K8s YAML files
+│   │   ├── frontend.yaml
+│   │   ├── api.yaml
+│   │   ├── influxdb.yaml
+│   │   ├── grafana.yaml
+│   │   └── ingress.yaml
+│   └── helm/                # Helm chart (Phase 3)
+│       ├── Chart.yaml
+│       └── values.yaml
+├── docker-compose.yml       # Multi-service orchestration
+├── Makefile                 # Build and deployment commands
+└── README.md               # This file
+```
+
+## Phase 0: Docker Compose (Current)
 
 ### Prerequisites
 - Docker & Docker Compose
 
-### Start Everything (Production Containers)
+### Quick Start
+1. **Clone and setup:**
+   ```sh
+   git clone https://github.com/pranavyey/influx-data-entry.git
+   cd influx-data-entry
+   ```
+
+2. **Copy environment files:**
+   ```sh
+   cp frontend/env.example frontend/.env.local
+   cp api/env.example api/.env.local
+   cp infra/influxdb/env.example infra/influxdb/.env.local
+   cp infra/grafana/env.example infra/grafana/.env.local
+   ```
+
+3. **Start everything:**
+   ```sh
+   make up
+   # or: docker compose up -d
+   ```
+
+4. **Access services:**
+   - Frontend: http://localhost:5173
+   - API: http://localhost:8000
+   - InfluxDB: http://localhost:8086
+   - Grafana: http://localhost:3000
+
+### Makefile Commands
 ```sh
-docker-compose up --build
+make build      # Build all Docker images
+make up         # Start all services
+make down       # Stop and remove everything
+make logs       # Follow logs from all services
+make clean      # Remove all containers, volumes, and images
+make status     # Show service status
 ```
-Services:
-- Frontend: http://localhost:3000
-- Backend:  http://localhost:8000
-- InfluxDB: http://localhost:8086
-- Grafana:  http://localhost:3001
 
-## Testing
-- Frontend UI (recommended): open http://localhost:3000 and submit examples:
+### Testing
+- **Frontend UI:** Open http://localhost:5173 and submit examples:
   - `temp,loc=kr,room=e408 value=28`
-  - `temp,loc=kr,room=e702 value=26`
   - `humidity,loc=kr value=0.56`
-  - For strings, use a different field name to avoid type conflicts, e.g. `temp,loc=kr value_str="e408"`
+  - For strings: `temp,loc=kr value_str="e408"`
 
-- Direct backend test:
+- **Direct API test:**
   ```sh
   curl -i -X POST http://localhost:8000/write-line-protocol \
     --data-binary 'temp,loc=kr value=28'
   ```
 
-- Grafana:
-  - Open http://localhost:3001 → use the InfluxDB datasource
-  - Sample Flux query:
-    ```
-    from(bucket: "my-bucket")
-      |> range(start: -15m)
-      |> filter(fn: (r) => r._measurement == "temp" and r._field == "value")
-    ```
+- **Grafana:** Open http://localhost:3000 → use InfluxDB datasource
 
-## Project Structure
-- `backend/` — FastAPI backend (production Dockerfile)
-- `influx-data-entry/` — Next.js frontend (production, standalone Dockerfile)
-- `docker-compose.yml` — Orchestrates all services
+## Phase 1: Enhanced Docker (Future)
+- [ ] Health checks and readiness probes
+- [ ] Resource limits and monitoring
+- [ ] Multi-stage builds optimization
+- [ ] Security scanning and best practices
+
+## Phase 2: Minikube Deployment (Future)
+- [ ] Generate Kubernetes manifests from docker-compose
+- [ ] Deploy to local Minikube cluster
+- [ ] Configure persistent volumes and secrets
+- [ ] Set up ingress for external access
+
+```sh
+# Future commands:
+make minikube-start    # Start minikube and deploy
+kubectl get pods       # Check deployment status
+minikube service list  # Access services
+```
+
+## Phase 3: EKS Production (Future)
+- [ ] Helm chart for easy deployment
+- [ ] CI/CD pipeline with GitHub Actions
+- [ ] Production-grade monitoring and logging
+- [ ] Auto-scaling and high availability
+
+```sh
+# Future commands:
+make k8s-deploy        # Deploy to EKS
+helm install influx-data-entry ./k8s/helm
+```
 
 ## Troubleshooting
-- Invalid line protocol: remove spaces around commas; quote strings (e.g., `"e408"`).
-- Field type conflict: don’t mix types for the same field; use separate fields like `value` (float) and `value_str` (string).
-- InfluxDB UI unavailable: ensure port `8086` is free and the `influxdb` container is healthy (`docker-compose ps`, `docker-compose logs influxdb`).
+- **Invalid line protocol:** Remove spaces around commas; quote strings (e.g., `"e408"`)
+- **Field type conflict:** Don't mix types for the same field; use separate fields like `value` (float) and `value_str` (string)
+- **Service unavailable:** Check `make status` and `make logs <service>`
+- **Port conflicts:** Ensure ports 5173, 8000, 8086, 3000 are free
 
 ## License
 MIT

@@ -1,0 +1,83 @@
+# Grafana Deployment and Service
+# TODO: Phase 2 - Implement Kubernetes manifests for Grafana
+# This will include:
+# - Deployment with persistent storage
+# - Service to expose Grafana
+# - PersistentVolumeClaim for data persistence
+# - ConfigMap for configuration
+# - Secrets for authentication
+
+---
+# Placeholder for Grafana deployment
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: grafana
+#   namespace: influx-data-entry
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: grafana
+#   template:
+#     metadata:
+#       labels:
+#         app: grafana
+#     spec:
+#       containers:
+#       - name: grafana
+#         image: grafana/grafana:10.4.2
+#         ports:
+#         - containerPort: 3000
+#         env:
+#         - name: GF_SECURITY_ADMIN_USER
+#           valueFrom:
+#             secretKeyRef:
+#               name: grafana-secrets
+#               key: admin-user
+#         - name: GF_SECURITY_ADMIN_PASSWORD
+#           valueFrom:
+#             secretKeyRef:
+#               name: grafana-secrets
+#               key: admin-password
+#         volumeMounts:
+#         - name: grafana-data
+#           mountPath: /var/lib/grafana
+#         - name: grafana-config
+#           mountPath: /etc/grafana/provisioning
+#       volumes:
+#       - name: grafana-data
+#         persistentVolumeClaim:
+#           claimName: grafana-pvc
+#       - name: grafana-config
+#         configMap:
+#           name: grafana-config
+
+---
+# Placeholder for Grafana service
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: grafana-service
+#   namespace: influx-data-entry
+# spec:
+#   selector:
+#     app: grafana
+#   ports:
+#   - port: 3000
+#     targetPort: 3000
+#   type: ClusterIP
+
+---
+# Placeholder for Grafana PVC
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: grafana-pvc
+#   namespace: influx-data-entry
+# spec:
+#   accessModes:
+#     - ReadWriteOnce
+#   resources:
+#     requests:
+#       storage: 5Gi
