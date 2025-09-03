@@ -1,3 +1,5 @@
 fastapi
+fastapi.responses
 httpx
+influxdb_client
 uvicorn

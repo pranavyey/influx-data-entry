@@ -40,6 +40,9 @@ status: ## Show status of all services
 restart: ## Restart all services
 	docker compose restart
 
+smoke: ##Run smoke test script
+	./scripts/smoke.sh
+
 # Development helpers
 dev: ## Start services with live reload (if configured)
 	docker compose up --build

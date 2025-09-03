@@ -1,7 +1,8 @@
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.repsonses import JSONResponse
+from fastapi.responses import JSONResponse
 import httpx
+from influxdb_client import InfluxDBClient
 import os
 
 app = FastAPI()
