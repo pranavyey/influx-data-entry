@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.repsonses import JSONResponse
 import httpx
 import os
 
@@ -16,9 +17,11 @@ app.add_middleware(
 
 # Safe defaults for container environment
 INFLUXDB_URL = os.getenv("INFLUXDB_URL", "http://influxdb:8086")
+INFLUXDB_TOKEN = os.getenv("INFLUXDB_TOKEN", "my-token")
 INFLUXDB_ORG = os.getenv("INFLUXDB_ORG", "my-org")
 INFLUXDB_BUCKET = os.getenv("INFLUXDB_BUCKET", "my-bucket")
-INFLUXDB_TOKEN = os.getenv("INFLUXDB_TOKEN", "my-token")
+
+client = InfluxDBClient(url=INFLUXDB_URL, token=INFLUXDB_TOKEN, org=INFLUXDB_ORG)
 
 @app.get("/")
 async def root():
@@ -34,7 +37,19 @@ async def root():
 
 @app.get("/health")
 async def health():
-    return {"status": "ok"}
+    return JSONResponse(content={"status": "healthy"}, status_code=200)
+
+@app.get("/ready")
+async def ready():
+    try:
+        h = client.health()
+        if getattr(h, "status", "").lower() == "pass":
+            return JSONResponse(content={"status": "ready"}, status_code=200)
+        return JSONResponse(
+            content={"status": "degraded", "details": getattr(h, "message", "")}, status_code=503
+        )
+    except Exception as e:
+        return JSONResponse(content={"status": "down", "error": str(e)}, status_code=503)
 
 @app.post("/write-line-protocol")
 async def write_line_protocol(request: Request):
